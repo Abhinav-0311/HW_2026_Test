@@ -1,0 +1,11 @@
+{
+  "name": "DoofusAdventure.PlayModeTests",
+  "references": [
+    "DoofusAdventure.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

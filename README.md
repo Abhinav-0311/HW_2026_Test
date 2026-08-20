@@ -4,7 +4,7 @@ A Unity 6 3D game prototype created for the Hitwicket Game Developer Challenge.
 
 ## Current status
 
-Project setup is complete. Gameplay implementation is in progress.
+Level 1 is complete: JSON-driven movement, timed platform spawning, and fall handling are implemented.
 
 ## Planned gameplay
 
@@ -20,7 +20,8 @@ Project setup is complete. Gameplay implementation is in progress.
 
 ## Controls
 
-Controls will be documented after the playable build is implemented.
+- **WASD** or **arrow keys**: move Doofus
+- Follow the floating gold beacon to see where the next Pulpit will appear.
 
 ## Repository contents
 
