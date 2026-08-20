@@ -124,13 +124,11 @@ namespace DoofusAdventure
                 return pulpitMaterial;
             }
 
-            var shader = Shader.Find("Standard");
-            pulpitMaterial = new Material(shader)
+            pulpitMaterial = Resources.Load<Material>("PulpitMaterial");
+            if (pulpitMaterial == null)
             {
-                color = new Color(0.08f, 0.58f, 0.20f)
-            };
-            pulpitMaterial.SetFloat("_Metallic", 0.72f);
-            pulpitMaterial.SetFloat("_Glossiness", 0.55f);
+                Debug.LogError("Pulpit material could not be loaded.");
+            }
             return pulpitMaterial;
         }
 
@@ -141,12 +139,11 @@ namespace DoofusAdventure
                 return beaconMaterial;
             }
 
-            beaconMaterial = new Material(Shader.Find("Standard"))
+            beaconMaterial = Resources.Load<Material>("BeaconMaterial");
+            if (beaconMaterial == null)
             {
-                color = new Color(1f, 0.72f, 0.08f)
-            };
-            beaconMaterial.EnableKeyword("_EMISSION");
-            beaconMaterial.SetColor("_EmissionColor", new Color(0.75f, 0.35f, 0.02f));
+                Debug.LogError("Beacon material could not be loaded.");
+            }
             return beaconMaterial;
         }
     }
