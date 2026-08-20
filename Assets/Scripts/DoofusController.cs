@@ -19,12 +19,16 @@ namespace DoofusAdventure
             session = gameSession;
             movementSpeed = speed;
             characterController = GetComponent<CharacterController>();
-            canMove = true;
+            canMove = false;
         }
 
-        public void Stop()
+        public void SetMovementEnabled(bool isEnabled)
         {
-            canMove = false;
+            canMove = isEnabled;
+            if (!isEnabled)
+            {
+                verticalVelocity = 0f;
+            }
         }
 
         private void Update()

@@ -32,7 +32,7 @@ namespace DoofusAdventure
             controller.center = new Vector3(0f, 0.5f, 0f);
 
             var doofusController = doofus.AddComponent<DoofusController>();
-            session.Initialize(doofusController, spawner);
+            session.Initialize(doofusController, spawner, config);
             doofusController.Initialize(session, config.player_data.speed);
 
             var cameraObject = new GameObject("Main Camera");
@@ -47,11 +47,11 @@ namespace DoofusAdventure
             directionalLight.intensity = 1.25f;
             lightObject.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 
-            spawner.Begin(config);
-            session.SetStartingPulpit(spawner.StartingPulpit);
-
             var scoreHud = root.AddComponent<ScoreHud>();
             scoreHud.Initialize(session);
+
+            var gameUi = root.AddComponent<GameUi>();
+            gameUi.Initialize(session, cameraObject.transform);
         }
     }
 }

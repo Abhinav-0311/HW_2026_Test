@@ -4,7 +4,7 @@ A Unity 6 3D game prototype created for the Hitwicket Game Developer Challenge.
 
 ## Current status
 
-Levels 1–2 are complete: JSON-driven movement, timed platform spawning, fall handling, scoring, and a score HUD are implemented.
+Levels 1–3 are complete: JSON-driven movement, timed platform spawning, scoring, and start/game-over/restart flow are implemented.
 
 ## Planned gameplay
 
