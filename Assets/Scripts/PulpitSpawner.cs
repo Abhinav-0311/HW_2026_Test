@@ -13,8 +13,11 @@ namespace DoofusAdventure
         private GameObject successorBeacon;
         private Vector2Int pendingSuccessorPosition;
         private bool successorPending;
+        private int nextPulpitId;
 
         public bool IsRunning { get; private set; }
+
+        public Pulpit StartingPulpit { get; private set; }
 
         public int ActivePulpitCount
         {
@@ -57,7 +60,7 @@ namespace DoofusAdventure
 
         private void SpawnInitialPulpit()
         {
-            SpawnAt(Vector2Int.zero);
+            StartingPulpit = SpawnAt(Vector2Int.zero);
         }
 
         private void TrySpawnPendingSuccessor()
@@ -72,7 +75,7 @@ namespace DoofusAdventure
             SpawnAt(pendingSuccessorPosition);
         }
 
-        private void SpawnAt(Vector2Int gridPosition)
+        private Pulpit SpawnAt(Vector2Int gridPosition)
         {
             if (successorBeacon != null)
             {
@@ -100,8 +103,9 @@ namespace DoofusAdventure
             }
 
             var successorPosition = PulpitGrid.ChooseOpenNeighbor(gridPosition, occupied);
-            pulpit.Initialize(this, gridPosition, successorPosition, lifetime, config.pulpit_data.pulpit_spawn_time);
+            pulpit.Initialize(this, gridPosition, successorPosition, nextPulpitId++, lifetime, config.pulpit_data.pulpit_spawn_time);
             CreateSuccessorBeacon(successorPosition);
+            return pulpit;
         }
 
         private void CreateSuccessorBeacon(Vector2Int gridPosition)

@@ -13,18 +13,22 @@ namespace DoofusAdventure
 
         public Vector2Int GridPosition { get; private set; }
 
+        public int PulpitId { get; private set; }
+
         public Vector2Int SuccessorGridPosition { get; private set; }
 
         public void Initialize(
             PulpitSpawner owner,
             Vector2Int gridPosition,
             Vector2Int successorGridPosition,
+            int pulpitId,
             float platformLifetime,
             float successorSpawnDelay)
         {
             spawner = owner;
             GridPosition = gridPosition;
             SuccessorGridPosition = successorGridPosition;
+            PulpitId = pulpitId;
             lifetime = platformLifetime;
             spawnDelay = successorSpawnDelay;
         }

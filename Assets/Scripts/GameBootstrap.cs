@@ -48,6 +48,10 @@ namespace DoofusAdventure
             lightObject.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 
             spawner.Begin(config);
+            session.SetStartingPulpit(spawner.StartingPulpit);
+
+            var scoreHud = root.AddComponent<ScoreHud>();
+            scoreHud.Initialize(session);
         }
     }
 }

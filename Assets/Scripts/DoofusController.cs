@@ -54,5 +54,14 @@ namespace DoofusAdventure
                 session.EndGame();
             }
         }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            var pulpit = hit.collider.GetComponent<Pulpit>();
+            if (pulpit != null)
+            {
+                session.RegisterPulpitReached(pulpit);
+            }
+        }
     }
 }
