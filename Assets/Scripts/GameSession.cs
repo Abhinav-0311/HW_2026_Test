@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 
 namespace DoofusAdventure
 {
@@ -22,6 +21,10 @@ namespace DoofusAdventure
             doofus = player;
             spawner = platformSpawner;
             config = gameConfig;
+            IsGameOver = false;
+            HasStarted = false;
+            Score = 0;
+            visitedPulpits.Clear();
         }
 
         public void StartGame()
@@ -44,7 +47,12 @@ namespace DoofusAdventure
                 return;
             }
 
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            IsGameOver = false;
+            HasStarted = false;
+            Score = 0;
+            visitedPulpits.Clear();
+            spawner.ResetForRestart();
+            doofus.ResetToStartPosition();
         }
 
         public void SetStartingPulpit(Pulpit pulpit)

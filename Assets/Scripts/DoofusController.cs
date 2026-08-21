@@ -31,6 +31,13 @@ namespace DoofusAdventure
             }
         }
 
+        public void ResetToStartPosition()
+        {
+            transform.position = new Vector3(0f, 1f, 0f);
+            verticalVelocity = 0f;
+            canMove = false;
+        }
+
         private void Update()
         {
             if (!canMove || characterController == null)
@@ -52,6 +59,7 @@ namespace DoofusAdventure
             verticalVelocity += Gravity * Time.deltaTime;
             var motion = (input * movementSpeed) + (Vector3.up * verticalVelocity);
             characterController.Move(motion * Time.deltaTime);
+            RegisterPulpitBelowDoofus();
 
             if (transform.position.y < DeathHeight)
             {
@@ -59,12 +67,16 @@ namespace DoofusAdventure
             }
         }
 
-        private void OnControllerColliderHit(ControllerColliderHit hit)
+        private void RegisterPulpitBelowDoofus()
         {
-            var pulpit = hit.collider.GetComponent<Pulpit>();
-            if (pulpit != null)
+            var origin = transform.position + Vector3.up * 0.1f;
+            if (Physics.Raycast(origin, Vector3.down, out var hit, 1.25f))
             {
-                session.RegisterPulpitReached(pulpit);
+                var pulpit = hit.collider.GetComponent<Pulpit>();
+                if (pulpit != null)
+                {
+                    session.RegisterPulpitReached(pulpit);
+                }
             }
         }
     }

@@ -5,53 +5,42 @@ namespace DoofusAdventure
     public static class GameBootstrap
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void CreateGame()
+        private static void InitializeAuthoredScene()
         {
-            if (Object.FindFirstObjectByType<GameSession>() != null)
+            var session = Object.FindFirstObjectByType<GameSession>();
+            var spawner = Object.FindFirstObjectByType<PulpitSpawner>();
+            var doofusController = Object.FindFirstObjectByType<DoofusController>();
+            var cameraFollow = Object.FindFirstObjectByType<CameraFollow>();
+            var scoreHud = Object.FindFirstObjectByType<ScoreHud>();
+            var gameUi = Object.FindFirstObjectByType<GameUi>();
+
+            if (session == null || spawner == null || doofusController == null ||
+                cameraFollow == null || scoreHud == null || gameUi == null)
             {
+                Debug.LogError("Main scene is missing one or more authored game objects. Use Doofus > Build Editable Main Scene.");
                 return;
             }
 
             var config = GameConfig.Load(out var diagnostic);
             Debug.Log(diagnostic);
 
-            var root = new GameObject("Doofus Adventure");
-            var session = root.AddComponent<GameSession>();
-            var spawner = root.AddComponent<PulpitSpawner>();
-
-            var doofus = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            doofus.name = "Doofus";
-            doofus.transform.position = new Vector3(0f, 1.1f, 0f);
-            var renderer = doofus.GetComponent<MeshRenderer>();
-            renderer.material.color = new Color(0.97f, 0.60f, 0.12f);
-
-            Object.Destroy(doofus.GetComponent<BoxCollider>());
-            var controller = doofus.AddComponent<CharacterController>();
-            controller.height = 1f;
-            controller.radius = 0.45f;
-            controller.center = new Vector3(0f, 0.5f, 0f);
-
-            var doofusController = doofus.AddComponent<DoofusController>();
+            HideEditorPreviewObjects(spawner.transform);
             session.Initialize(doofusController, spawner, config);
             doofusController.Initialize(session, config.player_data.speed);
-
-            var cameraObject = new GameObject("Main Camera");
-            cameraObject.tag = "MainCamera";
-            cameraObject.AddComponent<Camera>();
-            var cameraFollow = cameraObject.AddComponent<CameraFollow>();
-            cameraFollow.Initialize(doofus.transform);
-
-            var lightObject = new GameObject("Directional Light");
-            var directionalLight = lightObject.AddComponent<Light>();
-            directionalLight.type = LightType.Directional;
-            directionalLight.intensity = 1.25f;
-            lightObject.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
-
-            var scoreHud = root.AddComponent<ScoreHud>();
             scoreHud.Initialize(session);
+            cameraFollow.Initialize(doofusController.transform);
+            gameUi.Initialize(session, cameraFollow.transform);
+        }
 
-            var gameUi = root.AddComponent<GameUi>();
-            gameUi.Initialize(session, cameraObject.transform);
+        private static void HideEditorPreviewObjects(Transform root)
+        {
+            foreach (Transform child in root)
+            {
+                if (child.CompareTag("EditorOnly"))
+                {
+                    child.gameObject.SetActive(false);
+                }
+            }
         }
     }
 }

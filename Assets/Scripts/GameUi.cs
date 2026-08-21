@@ -5,20 +5,10 @@ namespace DoofusAdventure
     public sealed class GameUi : MonoBehaviour
     {
         private GameSession session;
-        private TextMesh title;
-        private TextMesh detail;
-        private TextMesh action;
 
         public void Initialize(GameSession gameSession, Transform cameraTransform)
         {
             session = gameSession;
-            var canvas = new GameObject("Game Screen Text");
-            canvas.transform.SetParent(cameraTransform, false);
-            canvas.transform.localPosition = new Vector3(0f, 0f, 8f);
-            title = CreateText(canvas.transform, new Vector3(0f, 1.2f, 0f), 0.7f);
-            detail = CreateText(canvas.transform, new Vector3(0f, 0.15f, 0f), 0.3f);
-            action = CreateText(canvas.transform, new Vector3(0f, -0.85f, 0f), 0.4f);
-            Refresh();
         }
 
         private void Update()
@@ -36,53 +26,45 @@ namespace DoofusAdventure
             {
                 session.RestartGame();
             }
-
-            Refresh();
         }
 
-        private void Refresh()
+        private void OnGUI()
         {
-            if (title == null)
+            if (session == null || (session.HasStarted && !session.IsGameOver))
             {
                 return;
             }
 
-            var showScreen = !session.HasStarted || session.IsGameOver;
-            title.gameObject.SetActive(showScreen);
-            detail.gameObject.SetActive(showScreen);
-            action.gameObject.SetActive(showScreen);
-            if (!showScreen)
-            {
-                return;
-            }
+            var panel = new Rect((Screen.width - 420f) / 2f, (Screen.height - 230f) / 2f, 420f, 230f);
+            var titleStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 30, normal = { textColor = Color.white } };
+            var bodyStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 17, normal = { textColor = new Color(0.9f, 0.95f, 1f) } };
+            var buttonStyle = new GUIStyle(GUI.skin.button) { fontSize = 18 };
+
+            var previousColor = GUI.color;
+            GUI.color = new Color(0.015f, 0.04f, 0.09f, 0.74f);
+            GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = new Color(0.05f, 0.13f, 0.25f, 0.98f);
+            GUI.DrawTexture(panel, Texture2D.whiteTexture);
+            GUI.color = previousColor;
 
             if (!session.HasStarted)
             {
-                title.text = "DOOFUS ADVENTURE";
-                detail.text = "Reach new Pulpits before they disappear";
-                action.text = "Press SPACE to Start";
+                GUI.Label(new Rect(panel.x, panel.y + 28f, panel.width, 42f), "DOOFUS ADVENTURE", titleStyle);
+                GUI.Label(new Rect(panel.x + 30f, panel.y + 84f, panel.width - 60f, 38f), "Reach new Pulpits before they disappear", bodyStyle);
+                if (GUI.Button(new Rect(panel.x + 110f, panel.y + 150f, 200f, 46f), "Start  (Space)", buttonStyle))
+                {
+                    session.StartGame();
+                }
             }
             else
             {
-                title.text = "GAME OVER";
-                detail.text = $"Score: {session.Score}";
-                action.text = "Press R to Restart";
+                GUI.Label(new Rect(panel.x, panel.y + 30f, panel.width, 42f), "GAME OVER", titleStyle);
+                GUI.Label(new Rect(panel.x, panel.y + 88f, panel.width, 34f), $"Score: {session.Score}", bodyStyle);
+                if (GUI.Button(new Rect(panel.x + 110f, panel.y + 150f, 200f, 46f), "Restart  (R)", buttonStyle))
+                {
+                    session.RestartGame();
+                }
             }
-        }
-
-        private static TextMesh CreateText(Transform parent, Vector3 localPosition, float characterSize)
-        {
-            var textObject = new GameObject("Screen Text");
-            textObject.transform.SetParent(parent, false);
-            textObject.transform.localPosition = localPosition;
-            var text = textObject.AddComponent<TextMesh>();
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            text.anchor = TextAnchor.MiddleCenter;
-            text.alignment = TextAlignment.Center;
-            text.characterSize = characterSize;
-            text.fontSize = 64;
-            text.color = Color.white;
-            return text;
         }
     }
 }

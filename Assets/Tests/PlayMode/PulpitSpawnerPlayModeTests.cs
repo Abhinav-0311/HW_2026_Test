@@ -19,7 +19,9 @@ namespace DoofusAdventure.PlayModeTests
             config.pulpit_data.pulpit_spawn_time = 2.5f;
             spawner.Begin(config);
 
-            yield return new WaitForSeconds(2.75f);
+            // With a 4 second Pulpit life and a 2.5 second remaining-time spawn
+            // rule, the adjacent Pulpit appears after 1.5 seconds.
+            yield return new WaitForSeconds(1.75f);
             Assert.That(spawner.ActivePulpitCount, Is.EqualTo(2));
 
             yield return new WaitForSeconds(2.5f);

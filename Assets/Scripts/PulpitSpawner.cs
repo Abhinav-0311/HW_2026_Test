@@ -9,8 +9,6 @@ namespace DoofusAdventure
         private GameConfig config;
         private Pulpit newestPulpit;
         private Material pulpitMaterial;
-        private Material beaconMaterial;
-        private GameObject successorBeacon;
         private Vector2Int pendingSuccessorPosition;
         private bool successorPending;
         private int nextPulpitId;
@@ -30,7 +28,17 @@ namespace DoofusAdventure
 
         public void Begin(GameConfig gameConfig)
         {
+            if (IsRunning)
+            {
+                return;
+            }
+
             config = gameConfig;
+            nextPulpitId = 0;
+            newestPulpit = null;
+            successorPending = false;
+            pendingSuccessorPosition = default;
+            ClearPreviousRuntimeObjects();
             IsRunning = true;
             SpawnInitialPulpit();
         }
@@ -38,6 +46,25 @@ namespace DoofusAdventure
         public void Stop()
         {
             IsRunning = false;
+        }
+
+        public void ResetForRestart()
+        {
+            IsRunning = false;
+            successorPending = false;
+            newestPulpit = null;
+            StartingPulpit = null;
+            nextPulpitId = 0;
+
+            foreach (var pulpit in activePulpits)
+            {
+                if (pulpit != null)
+                {
+                    Destroy(pulpit.gameObject);
+                }
+            }
+
+            activePulpits.Clear();
         }
 
         public void RequestSuccessor(Pulpit source)
@@ -63,6 +90,21 @@ namespace DoofusAdventure
             StartingPulpit = SpawnAt(Vector2Int.zero);
         }
 
+        private void ClearPreviousRuntimeObjects()
+        {
+            activePulpits.Clear();
+            StartingPulpit = null;
+
+            for (var index = transform.childCount - 1; index >= 0; index--)
+            {
+                var child = transform.GetChild(index).gameObject;
+                if (child.name.StartsWith("Pulpit (") || child.name == "Next Pulpit Beacon" || child.name == "Score Point")
+                {
+                    Destroy(child);
+                }
+            }
+        }
+
         private void TrySpawnPendingSuccessor()
         {
             activePulpits.RemoveAll(pulpit => pulpit == null);
@@ -77,11 +119,6 @@ namespace DoofusAdventure
 
         private Pulpit SpawnAt(Vector2Int gridPosition)
         {
-            if (successorBeacon != null)
-            {
-                Destroy(successorBeacon);
-            }
-
             var platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
             platform.name = $"Pulpit ({gridPosition.x}, {gridPosition.y})";
             platform.transform.SetParent(transform);
@@ -104,21 +141,7 @@ namespace DoofusAdventure
 
             var successorPosition = PulpitGrid.ChooseOpenNeighbor(gridPosition, occupied);
             pulpit.Initialize(this, gridPosition, successorPosition, nextPulpitId++, lifetime, config.pulpit_data.pulpit_spawn_time);
-            CreateSuccessorBeacon(successorPosition);
             return pulpit;
-        }
-
-        private void CreateSuccessorBeacon(Vector2Int gridPosition)
-        {
-            successorBeacon = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            successorBeacon.name = "Next Pulpit Beacon";
-            successorBeacon.transform.SetParent(transform);
-            successorBeacon.transform.position = PulpitGrid.ToWorldPosition(gridPosition, GameConfig.PlatformSize) + Vector3.up * 1.5f;
-            successorBeacon.transform.localScale = Vector3.one * 0.8f;
-            Destroy(successorBeacon.GetComponent<Collider>());
-
-            var renderer = successorBeacon.GetComponent<MeshRenderer>();
-            renderer.sharedMaterial = GetBeaconMaterial();
         }
 
         private Material GetPulpitMaterial()
@@ -136,19 +159,5 @@ namespace DoofusAdventure
             return pulpitMaterial;
         }
 
-        private Material GetBeaconMaterial()
-        {
-            if (beaconMaterial != null)
-            {
-                return beaconMaterial;
-            }
-
-            beaconMaterial = Resources.Load<Material>("BeaconMaterial");
-            if (beaconMaterial == null)
-            {
-                Debug.LogError("Beacon material could not be loaded.");
-            }
-            return beaconMaterial;
-        }
     }
 }
